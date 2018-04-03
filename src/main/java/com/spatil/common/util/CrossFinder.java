@@ -1,4 +1,4 @@
-package com.mkyong.common.util;
+package com.spatil.common.util;
 
 public class CrossFinder {
     public static boolean rowCrossed(String[][] area, int sides) {

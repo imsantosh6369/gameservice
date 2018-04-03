@@ -1,11 +1,14 @@
-package com.mkyong.common.controller;
+package com.spatil.common.controller;
 
-
-import com.mkyong.common.service.GameService;
-import com.mkyong.common.model.*;
+import com.spatil.common.model.CurrentStatus;
+import com.spatil.common.model.Error;
+import com.spatil.common.service.GameService;
+import com.spatil.common.model.Game;
+import com.spatil.common.model.MyMove;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -13,16 +16,24 @@ import java.util.Random;
 @RestController
 @RequestMapping("/game")
 public class TicTacToeController {
+    final static Logger logger = Logger.getLogger(TicTacToeController.class);
     HashMap<Integer, GameService> gameServiceHashMap = new HashMap<Integer, GameService>();
     Random random = new Random();
 
     @PostMapping
-    public ResponseEntity<Game> start(@RequestBody Game game) {
+    public ResponseEntity<Object> start(@RequestBody Game game) {
         int gameId = random.nextInt(1000);
         game.setGameID(gameId);
         GameService obj = new GameService(game);
         gameServiceHashMap.put(gameId, obj);
         obj.startGame(game);
+
+        if(game.isAgainstComputer()&&game.getPlayerHashMap().size()>1) {
+            Error error=new Error();
+            error.setMessage("Playing against computer!!!");
+            logger.error("More than 1 player added while playing against computer!!!");
+            return ResponseEntity.ok(error);
+        }
         System.out.println("Game has started, Waiting for player to move!!!!");
         return ResponseEntity.ok(game);
     }
