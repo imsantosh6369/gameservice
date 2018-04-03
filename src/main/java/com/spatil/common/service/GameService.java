@@ -1,7 +1,7 @@
-package com.mkyong.common.service;
+package com.spatil.common.service;
 
-import com.mkyong.common.model.*;
-import com.mkyong.common.util.CrossFinder;
+import com.spatil.common.model.*;
+import com.spatil.common.util.CrossFinder;
 
 public class GameService {
     String[][] area;
@@ -37,7 +37,10 @@ public class GameService {
         int x = move.getX();
         int y = move.getY();
         int noOfBoard = this.game.getNoOfboards();
-        if (currentPlayer != null && currentPlayer.equals(move.getPlayerName())) {
+        if(this.game.getPlayerHashMap().size()>1&&this.game.isAgainstComputer()) {
+            System.out.println("play with single user as you are playing against computer");
+            return false;
+        } else if (currentPlayer != null && currentPlayer.equals(move.getPlayerName())) {
             System.out.println("Its other user turn to play!!");
             return false;
         } else if (this.game.getStatus().getStatus().equals(Status.WON)) {

@@ -1,8 +1,5 @@
-package com.mkyong.common.model;
+package com.spatil.common.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Game {

@@ -1,4 +1,4 @@
-package com.mkyong.common.model;
+package com.spatil.common.model;
 
 public class MyMove {
     public String getPlayerName() {
