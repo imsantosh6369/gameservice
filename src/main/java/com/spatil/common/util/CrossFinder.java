@@ -3,34 +3,42 @@ package com.spatil.common.util;
 public class CrossFinder {
     public static boolean rowCrossed(String[][] area, int sides) {
         for (int i = 0; i < sides; i++) {
-            if (area[i][0] == area[i][1] &&
-                    area[i][1] == area[i][2] &&
-                    area[i][0] != null)
-                return true;
+            if(area[i][0]!=null&&area[i][1]!=null&&area[i][2]!=null)
+            {
+                if(area[i][0].equals(area[i][1])&&area[i][1].equals(area[i][2])) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
     public static boolean columnCrossed(String[][] area, int sides) {
         for (int i = 0; i < sides; i++) {
-            if (area[0][i] == area[1][i] &&
-                    area[1][i] == area[2][i] &&
-                    area[0][i] != null)
-                return true;
+            if(area[0][i]!=null&&area[1][i]!=null&&area[2][i]!=null)
+            {
+                if(area[0][i].equals(area[1][i])&&area[1][i].equals(area[2][i])) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
     public static boolean diagonalCrossed(String[][] area, int sides) {
-        if (area[0][0] == area[1][1] &&
-                area[1][1] == area[2][2] &&
-                area[0][0] != null)
-            return true;
 
-        if (area[0][2] == area[1][1] &&
-                area[1][1] == area[2][0] &&
-                area[0][2] != null)
-            return true;
+        if(area[0][0]!=null&&area[1][1]!=null&&area[2][2]!=null)
+        {
+            if(area[0][0].equals(area[1][1])&&area[1][1].equals(area[2][2])) {
+                return true;
+            }
+        }
+        if(area[0][2]!=null&&area[1][1]!=null&&area[2][0]!=null)
+        {
+            if(area[0][2].equals(area[1][1])&&area[1][1].equals(area[2][0])) {
+                return true;
+            }
+        }
         return false;
     }
 

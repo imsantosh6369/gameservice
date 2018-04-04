@@ -4,6 +4,7 @@ import com.spatil.common.model.*;
 import com.spatil.common.model.Error;
 import com.spatil.common.util.CrossFinder;
 import com.spatil.common.util.Errors;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.log4j.Logger;
 
 
@@ -15,6 +16,9 @@ public class GameService {
     String currentPlayer = null;
     private Game game;
 
+    public GameService() {
+
+    }
     public GameService(Game game) {
         this.game = game;
     }
@@ -49,7 +53,7 @@ public class GameService {
         } else if (this.game.getStatus().getStatus().equals(Status.WON)) {
             logger.error(Errors.ALREADYWON.getDescription());
             return new Error(Errors.ALREADYWON.getDescription(), Errors.ALREADYWON.getCode());
-        } else if (this.game.getStatus().getStatus().equals(Status.DRAW)) {
+        } else if (this.game.getStatus().getStatus().equals(Status.DRAWN)) {
             logger.error(Errors.ALREADYDRAWN.getDescription());
             return new Error(Errors.ALREADYDRAWN.getDescription(), Errors.ALREADYDRAWN.getCode());
         } else if (this.area[x][y] != null) {
@@ -97,7 +101,7 @@ public class GameService {
                 return this.game;
             } else if (isItDraw()) {
                 logger.info("Game has drawn");
-                currentStatus.setStatus(Status.DRAW);
+                currentStatus.setStatus(Status.DRAWN);
                 this.game.setStatus(currentStatus);
                 return this.game;
             }
@@ -136,6 +140,7 @@ public class GameService {
         return (this.totalCount == (this.game.getNoOfboards() * this.game.getNoOfboards()));
     }
 
+    @Ignore
     public CurrentStatus getCurrentGameStatus() {
         return game.getStatus();
     }
