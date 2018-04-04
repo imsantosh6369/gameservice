@@ -1,9 +1,15 @@
 package com.spatil.common.service;
 
 import com.spatil.common.model.*;
+import com.spatil.common.model.Error;
 import com.spatil.common.util.CrossFinder;
+import com.spatil.common.util.Errors;
+import org.apache.log4j.Logger;
+
 
 public class GameService {
+
+    final static Logger logger = Logger.getLogger(GameService.class);
     String[][] area;
     int totalCount = 0;
     String currentPlayer = null;
@@ -33,52 +39,33 @@ public class GameService {
         System.out.println("Hello " + players + "!!! Lets start game");
     }
 
-    public synchronized boolean validateMove(MyMove move) {
+    public synchronized Error validateMove(MyMove move) {
         int x = move.getX();
         int y = move.getY();
         int noOfBoard = this.game.getNoOfboards();
-        if(this.game.getPlayerHashMap().size()>1&&this.game.isAgainstComputer()) {
-            System.out.println("play with single user as you are playing against computer");
-            return false;
-        } else if (currentPlayer != null && currentPlayer.equals(move.getPlayerName())) {
-            System.out.println("Its other user turn to play!!");
-            return false;
+        if (currentPlayer != null && currentPlayer.equals(move.getPlayerName())) {
+            logger.error(Errors.OTHERUSERTURN.getDescription());
+            return new Error(Errors.OTHERUSERTURN.getDescription(), Errors.OTHERUSERTURN.getCode());
         } else if (this.game.getStatus().getStatus().equals(Status.WON)) {
-            System.out.println("Game is already in Won status");
-            return false;
+            logger.error(Errors.ALREADYWON.getDescription());
+            return new Error(Errors.ALREADYWON.getDescription(), Errors.ALREADYWON.getCode());
         } else if (this.game.getStatus().getStatus().equals(Status.DRAW)) {
-            System.out.println("Game is already in DRAW status");
-            return false;
-        } else if (this.area[x][y] != null)
-            return false;
-        else if (!(x < noOfBoard && x >= 0 && y < noOfBoard && y >= 0))
-            return false;
-        else
-            return true;
+            logger.error(Errors.ALREADYDRAWN.getDescription());
+            return new Error(Errors.ALREADYDRAWN.getDescription(), Errors.ALREADYDRAWN.getCode());
+        } else if (this.area[x][y] != null) {
+            logger.error(Errors.ALREADYPRESENT.getDescription());
+            return new Error(Errors.ALREADYPRESENT.getDescription(), Errors.ALREADYPRESENT.getCode());
+        } else if (!(x < noOfBoard && x >= 0 && y < noOfBoard && y >= 0)) {
+            logger.error(Errors.OUTOFBOUNDLOC.getDescription());
+            return new Error(Errors.OUTOFBOUNDLOC.getDescription(), Errors.OUTOFBOUNDLOC.getCode());
+        } else
+            return new Error(Errors.SUCCESS.getDescription(), Errors.SUCCESS.getCode());
+
     }
-/*
-    public synchronized Game playWithMe(MyMove move) {
-        CurrentStatus currentStatus = this.game.getStatus();
-        currentStatus.setStatus(Status.INPROGRESS);
-        currentStatus.setPlayerName(move.getPlayerName());
-        this.game.setStatus(currentStatus);
-        //process move
-        this.area[move.getX()][move.getY()] = this.game.getPlayerHashMap().get(move.getPlayerName()).getPlaceHolder();
-        this.totalCount++;
-        //is win
-        if (isItWin()) {
-            currentStatus.setStatus(Status.WON);
-            this.game.setStatus(currentStatus);
-        } else if (isItDraw()) {
-            currentStatus.setStatus(Status.DRAW);
-            this.game.setStatus(currentStatus);
-        }
-        currentPlayer = move.getPlayerName();
-        return this.game;
-    }
-*/
 
     public synchronized Game play(MyMove move) {
+        logger.info("Inside play method");
+
         CurrentStatus currentStatus = this.game.getStatus();
         currentStatus.setStatus(Status.INPROGRESS);
         currentStatus.setPlayerName(move.getPlayerName());
@@ -93,7 +80,6 @@ public class GameService {
         computer.setName("COMPUTER");
         String currentPlayerName = move.getPlayerName();
 
-
         int x = move.getX();
         int y = move.getY();
         String placeHolder = this.game.getPlayerHashMap().get(move.getPlayerName()).getPlaceHolder();
@@ -105,21 +91,24 @@ public class GameService {
             this.totalCount++;
             //is win
             if (isItWin()) {
+                logger.info("Game has own by"+currentPlayer);
                 currentStatus.setStatus(Status.WON);
                 this.game.setStatus(currentStatus);
                 return this.game;
             } else if (isItDraw()) {
+                logger.info("Game has drawn");
                 currentStatus.setStatus(Status.DRAW);
                 this.game.setStatus(currentStatus);
                 return this.game;
             }
             if (!currentPlayer.equals("COMPUTER") && this.game.isAgainstComputer()) {
+                logger.info("Computer started playing");
                 currentPlayerName = computer.getName();
                 placeHolder = computer.getPlaceHolder();
                 currentStatus.setPlayerName(currentPlayerName);
                 String[] loc = this.getComputerMove(this.area, this.game.getPlayerHashMap().get(move.getPlayerName()).getPlaceHolder(), placeHolder).split(" ");
                 if (loc == null) {
-                    System.out.println("Game has either draw or won!!!");
+                    logger.info("Game has either drawn or won!!!");
                     return this.game;
                 }
                 x = Integer.parseInt(loc[0]);
@@ -129,7 +118,6 @@ public class GameService {
             }
             currentPlayer = currentPlayerName;
         }
-
         return this.game;
     }
 
@@ -153,7 +141,7 @@ public class GameService {
     }
 
     private String getComputerMove(String[][] area, String oppPlaceHolder, String computerPlaceHolder) {
-
+        logger.info("Generating computer move");
         String attackRowPlace = CrossFinder.rowPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
         String attackColumnPlace = CrossFinder.columnPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
         String attackDiagonalPlace = CrossFinder.diagonalPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
