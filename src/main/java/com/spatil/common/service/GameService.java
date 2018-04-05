@@ -2,7 +2,6 @@ package com.spatil.common.service;
 
 import com.spatil.common.model.*;
 import com.spatil.common.model.Error;
-import com.spatil.common.util.CrossFinder;
 import com.spatil.common.util.Errors;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.log4j.Logger;
@@ -63,10 +62,11 @@ public class GameService {
         int x = move.getX();
         int y = move.getY();
         int noOfBoard = this.game.getNoOfboards();
-        if(this.getTotalCount()==0&&!this.getGame().getStatus().getPlayerName().equals(move.getPlayerName())) {
+        if (this.getTotalCount() == 0 && !this.getGame().getStatus().getPlayerName().equals(move.getPlayerName())) {
             logger.error(Errors.FIRSTMOVEERROR.getDescription());
             return new Error(Errors.FIRSTMOVEERROR.getDescription(), Errors.FIRSTMOVEERROR.getCode());
-        }if (this.getCurrentPlayer() != null && this.getCurrentPlayer().equals(move.getPlayerName())) {
+        }
+        if (this.getCurrentPlayer() != null && this.getCurrentPlayer().equals(move.getPlayerName())) {
             logger.error(Errors.OTHERUSERTURN.getDescription());
             return new Error(Errors.OTHERUSERTURN.getDescription(), Errors.OTHERUSERTURN.getCode());
         } else if (this.game.getStatus().getStatus().equals(Status.WON)) {
@@ -129,13 +129,28 @@ public class GameService {
                 currentPlayerName = computer.getName();
                 placeHolder = computer.getPlaceHolder();
                 currentStatus.setPlayerName(currentPlayerName);
-                String[] loc = this.getComputerMove(this.area, this.game.getPlayerHashMap().get(move.getPlayerName()).getPlaceHolder(), placeHolder).split(" ");
-                if (loc == null) {
+                String attacking = this.getComputerMove(placeHolder);
+                String defensive = this.getComputerMove(this.game.getPlayerHashMap().get(move.getPlayerName()).getPlaceHolder());
+
+                String[] attArr = attacking.split(" ");
+                String[] defArr = defensive.split(" ");
+
+
+                if (attacking.equals("") && defensive.equals("") && emptyPlace() == null) {
                     logger.info("Game has either drawn or won!!!");
                     return this.game;
                 }
-                x = Integer.parseInt(loc[0]);
-                y = Integer.parseInt(loc[1]);
+                if (!attacking.equals("")) {
+                    x = Integer.parseInt(attArr[0]);
+                    y = Integer.parseInt(attArr[1]);
+                } else if (!defensive.equals("")) {
+                    x = Integer.parseInt(defArr[0]);
+                    y = Integer.parseInt(defArr[1]);
+                } else {
+                    String[] temp = emptyPlace().split(" ");
+                    x = Integer.parseInt(temp[0]);
+                    y = Integer.parseInt(temp[1]);
+                }
             } else {
                 isPlay = false;
             }
@@ -149,8 +164,104 @@ public class GameService {
         area = new String[size][size];
     }
 
-    private boolean isItWin(String val) {
 
+    private String getComputerMove(String oppPlaceHolder) {
+
+        int counter = 0;
+        //horizontal
+        int N = this.getGame().getNoOfboards();
+        String[][] board = this.getArea();
+        String temp = "";
+        int nullCount = 0;
+        for (int i = 0; i < N; i++) {
+            counter = 0;
+            nullCount = 0;
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] != null && board[i][j].equals(oppPlaceHolder)) {
+                    counter = counter + 1;
+                } else if (board[i][j] == null) {
+                    nullCount++;
+                    temp = i + " " + j;
+                }
+            }
+            if (counter == N - 1 && nullCount == 1) {
+                return temp;
+            }
+            temp = "";
+        }
+
+        temp = "";
+        //vertical
+        for (int i = 0; i < N; i++) {
+            counter = 0;
+            nullCount = 0;
+            for (int j = 0; j < N; j++) {
+                if (board[j][i] != null && board[j][i].equals(oppPlaceHolder)) {
+                    counter = counter + 1;
+                } else if (board[j][i] == null) {
+                    nullCount++;
+                    temp = j + " " + i;
+                }
+            }
+            if (counter == N - 1 && nullCount == 1) {
+                return temp;
+            }
+            temp = "";
+        }
+
+        temp = "";
+        //diagonal from left-top to right-bottom
+        counter = 0;
+        nullCount = 0;
+        for (int i = 0; i < N; i++) {
+            if (board[i][i] != null && board[i][i].equals(oppPlaceHolder)) {
+                counter = counter + 1;
+            } else if (board[i][i] == null) {
+                nullCount++;
+                temp = i + " " + i;
+            }
+            //counter = 1;
+        }
+        if (counter == N - 1 && nullCount == 1) {
+            return temp;
+        }
+
+        temp = "";
+        counter = 0;
+        nullCount = 0;
+        //diagonal from right-top to left-bottom
+        for (int i = 0; i < N; i++) {
+            if (board[i][N - 1 - i] != null && board[i][N - 1 - i].equals(oppPlaceHolder)) {
+                counter = counter + 1;
+            } else if (board[i][N - 1 - i] == null) {
+                nullCount++;
+                int l = i;
+                int m = N - 1 - i;
+                temp = l + " " + m;
+            }
+            //counter = 1;
+        }
+        if (counter == N - 1 && nullCount == 1) {
+            return temp;
+        }
+        temp = "";
+        return temp;
+    }
+
+    private String emptyPlace() {
+        String[][] board = this.getArea();
+        int n = this.getGame().getNoOfboards();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == null)
+                    return i + " " + j;
+            }
+        }
+        return null;
+    }
+
+    private boolean isItWin(String val) {
         String[] value = val.split(" ");
         int x = Integer.parseInt(value[0]);
         int y = Integer.parseInt(value[1]);
@@ -213,33 +324,6 @@ public class GameService {
     @Ignore
     public CurrentStatus getCurrentGameStatus() {
         return game.getStatus();
-    }
-
-    private String getComputerMove(String[][] area, String oppPlaceHolder, String computerPlaceHolder) {
-        logger.info("Generating computer move");
-        String attackRowPlace = CrossFinder.rowPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
-        String attackColumnPlace = CrossFinder.columnPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
-        String attackDiagonalPlace = CrossFinder.diagonalPlaceToInsert(area, computerPlaceHolder, this.game.getNoOfboards());
-
-        String defenceRowPlace = CrossFinder.rowPlaceToInsert(area, oppPlaceHolder, this.game.getNoOfboards());
-        String defenceColumnPlace = CrossFinder.columnPlaceToInsert(area, oppPlaceHolder, this.game.getNoOfboards());
-        String defenceDiagonalPlace = CrossFinder.diagonalPlaceToInsert(area, oppPlaceHolder, this.game.getNoOfboards());
-
-        if (attackRowPlace != null)
-            return attackRowPlace;
-        else if (attackColumnPlace != null)
-            return attackColumnPlace;
-        else if (attackDiagonalPlace != null)
-            return attackDiagonalPlace;
-        else if (defenceRowPlace != null)
-            return defenceRowPlace;
-        else if (defenceColumnPlace != null)
-            return defenceColumnPlace;
-        else if (defenceDiagonalPlace != null)
-            return defenceDiagonalPlace;
-        else
-            return CrossFinder.getEmptyPlace(area, this.game.getNoOfboards());
-
     }
 
 }

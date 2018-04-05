@@ -9,7 +9,7 @@ import com.spatil.common.service.GameService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-public class AdapterImpl implements Adapter{
+public class AdapterImpl implements Adapter {
 
     private Bucket gamesBucket;
     private static final ObjectMapper jacksonMapper = new CustomObjectMapper();
@@ -17,8 +17,8 @@ public class AdapterImpl implements Adapter{
 
     public AdapterImpl() {
         Cluster cluster = CouchbaseCluster.create();
-        cluster.authenticate("Administrator","password");
-        gamesBucket=cluster.openBucket("GameBucket");
+        cluster.authenticate("Administrator", "password");
+        gamesBucket = cluster.openBucket("GameBucket");
     }
 
     public GameService get(String key) {
@@ -38,9 +38,9 @@ public class AdapterImpl implements Adapter{
 
     public static <T> T getObjectFromJson(String json, Class<T> clazz) {
         if (!StringUtils.isBlank(json)) {
-            int idex=json.indexOf("currentGameStatus");
-            json=json.substring(0,idex-3);
-            json=json+"}}";
+            int idex = json.indexOf("currentGameStatus");
+            json = json.substring(0, idex - 3);
+            json = json + "}}";
             try {
                 return jacksonMapper.readValue(json, clazz);
             } catch (Exception e) {
