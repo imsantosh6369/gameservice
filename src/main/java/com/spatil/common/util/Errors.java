@@ -8,7 +8,8 @@ public enum Errors {
     ALREADYWON(104,"Its in won state"),
     ALREADYDRAWN(105,"Its in lost state"),
     ALREADYPRESENT(106,"Position is not vacant"),
-    OUTOFBOUNDLOC(106,"Position is out of the board");
+    OUTOFBOUNDLOC(106,"Position is out of the board"),
+    FIRSTMOVEERROR(107,"Let other user play first");
 
     private final int code;
     private final String description;

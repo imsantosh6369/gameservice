@@ -52,9 +52,7 @@ public class TicTacToeController {
         } else {
             adapterImpl.set(gameID + "", gameService, 20);
         }
-        gameService = null;
-        System.gc();
-        return ResponseEntity.ok(adapterImpl.get(gameID + "").getGame());
+        return ResponseEntity.ok(gameService.getGame());
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
