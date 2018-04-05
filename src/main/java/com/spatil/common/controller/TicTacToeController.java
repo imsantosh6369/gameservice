@@ -17,16 +17,21 @@ public class TicTacToeController {
     Random random = new Random();
     AdapterImpl adapterImpl = new AdapterImpl();
 
+
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     public ResponseEntity<Object> start(@RequestBody Game game) {
         int gameId = random.nextInt(1000);
         game.setGameID(gameId);
         GameService obj = new GameService(game);
-        obj.startGame(game);
         if (game.isAgainstComputer() && game.getPlayerHashMap().size() > 1) {
             logger.error(Errors.MOREUSERSAGAINSTCOMPUTER);
             return ResponseEntity.ok(new Error(Errors.MOREUSERSAGAINSTCOMPUTER.toString(), Errors.MOREUSERSAGAINSTCOMPUTER.getCode()));
         }
+        if(game.getNoOfboards()<=1) {
+            logger.error(Errors.MORETHANONESIDES);
+            return ResponseEntity.ok(new Error(Errors.MORETHANONESIDES.toString(),Errors.MORETHANONESIDES.getCode()));
+        }
+        obj.startGame(game);
         adapterImpl.set(gameId + "", obj, 20);
         logger.info("Game has started, Waiting for player to move!!!!");
         return ResponseEntity.ok(game);
@@ -36,7 +41,7 @@ public class TicTacToeController {
     public ResponseEntity<Object> play(@RequestHeader("gameID") int gameID, @RequestBody MyMove move) {
         logger.info("Entered play method");
         GameService gameService = adapterImpl.get(gameID + "");
-        if (adapterImpl.get(gameID + "") == null) {
+        if (gameService== null) {
             logger.error(Errors.NOTSTARTED);
             return ResponseEntity.ok(new Error(Errors.NOTSTARTED.toString(), Errors.NOTSTARTED.getCode()));
         }
