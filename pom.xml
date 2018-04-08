@@ -11,6 +11,7 @@
 	<properties>
 		<spring.version>4.3.5.RELEASE</spring.version>
 		<jackson.version>2.5.0</jackson.version>
+		<couchbase-version>2.5.3</couchbase-version>
 		<jdk.version>1.8</jdk.version>
 	</properties>
 
@@ -46,6 +47,19 @@
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
+        </dependency>
+
+		<dependency>
+			<groupId>com.couchbase.client</groupId>
+			<artifactId>java-client</artifactId>
+			<version>${couchbase-version}</version>
+		</dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
         </dependency>
 
 		<!-- Jackson JSON Mapper

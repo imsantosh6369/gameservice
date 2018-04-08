@@ -3,11 +3,11 @@ package com.spatil.common.model;
 import java.util.HashMap;
 
 public class Game {
-    HashMap<String, Player> playerHashMap;
-    int noOfboards;
-    boolean againstComputer;
-    CurrentStatus status;
-    int gameID;
+    private HashMap<String, Player> playerHashMap;
+    private int noOfboards;
+    private boolean againstComputer;
+    private CurrentStatus status;
+    private int gameID;
 
     public boolean isAgainstComputer() {
         return againstComputer;
@@ -33,12 +33,12 @@ public class Game {
         this.playerHashMap = playerHashMap;
     }
 
-    public void setStatus(CurrentStatus status) {
-        this.status = status;
-    }
-
     public CurrentStatus getStatus() {
         return status;
+    }
+
+    public void setStatus(CurrentStatus status) {
+        this.status = status;
     }
 
     public int getNoOfboards() {

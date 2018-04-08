@@ -8,12 +8,14 @@ public enum Errors {
     ALREADYWON(104,"Its in won state"),
     ALREADYDRAWN(105,"Its in lost state"),
     ALREADYPRESENT(106,"Position is not vacant"),
-    OUTOFBOUNDLOC(106,"Position is out of the board");
+    OUTOFBOUNDLOC(106,"Position is out of the board"),
+    FIRSTMOVEERROR(107,"Let other user play first"),
+    MORETHANONESIDES(108,"Play with more than one sides");
 
     private final int code;
     private final String description;
 
-    private Errors(int code, String description) {
+     Errors(int code, String description) {
         this.code = code;
         this.description = description;
     }

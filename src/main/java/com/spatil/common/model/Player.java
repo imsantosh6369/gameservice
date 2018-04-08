@@ -1,8 +1,8 @@
 package com.spatil.common.model;
 
 public class Player {
-    String name;
-    String placeHolder;
+    private String name;
+    private String placeHolder;
 
     public String getName() {
         return name;
